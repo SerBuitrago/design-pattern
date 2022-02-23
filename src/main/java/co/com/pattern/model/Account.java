@@ -13,5 +13,5 @@ public class Account {
 
     private Integer id;
     private String client;
-
+    private Double money;
 }
