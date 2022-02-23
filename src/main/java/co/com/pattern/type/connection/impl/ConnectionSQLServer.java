@@ -1,7 +1,7 @@
-package co.com.pattern.connection.impl;
+package co.com.pattern.type.connection.impl;
 
-import co.com.pattern.connection.Connection;
-import co.com.pattern.connection.IConnection;
+import co.com.pattern.type.connection.Connection;
+import co.com.pattern.type.connection.IConnection;
 
 public class ConnectionSQLServer extends Connection implements IConnection {
 

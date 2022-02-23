@@ -1,4 +1,4 @@
-package co.com.pattern.connection;
+package co.com.pattern.type.connection;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
