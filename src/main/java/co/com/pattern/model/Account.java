@@ -12,6 +12,15 @@ import lombok.NoArgsConstructor;
 public class Account {
 
     private Integer id;
-    private String client;
     private Double money;
+
+    public void withdrawals(double amount){
+        this.money = this.money - amount;
+        System.out.println("Withdrawals: $".concat(String.valueOf(money)));
+    }
+
+    public void deposit(double amount){
+        this.money = this.money + amount;
+        System.out.println("Deposit: $".concat(String.valueOf(money)));
+    }
 }
