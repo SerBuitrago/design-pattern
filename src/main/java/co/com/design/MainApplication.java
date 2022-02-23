@@ -1,7 +1,6 @@
 package co.com.design;
 
-import co.com.pattern.IAccount;
-import co.com.pattern.impl.AccountSavingsImpl;
+import co.com.pattern.facade.CheckFacade;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,15 +14,11 @@ public class MainApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		AccountSavingsImpl account = new AccountSavingsImpl();
-		account.setAmount(100.000D);
+		CheckFacade client1 = new CheckFacade();
+		client1.search("23-02-2022", "23-03-2022", "Cucuta/Colombia", "Amsterdam/Netherlands");
 
-		AccountSavingsImpl accountClone = (AccountSavingsImpl) account.cloneAccount();
-
-		System.out.println(account);
-		System.out.println(accountClone);
-
-		System.out.println(account == accountClone);
+		CheckFacade client2 = new CheckFacade();
+		client2.search("24-02-2022", "28-02-2022", "Medellin/Colombia", "Cucuta/Colombia");
 	}
 
 }
