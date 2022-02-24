@@ -1,21 +1,18 @@
 package co.com.design;
 
-import co.com.pattern.PlayOriginator;
-import co.com.pattern.caretaker.PlayCaretaker;
-import co.com.pattern.model.Play;
+import co.com.pattern.observer.impl.ObserverCO;
+import co.com.pattern.observer.impl.ObserverDollar;
+import co.com.pattern.observer.impl.ObserverMX;
+import co.com.pattern.subject.Subject;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import reactor.core.publisher.Mono;
 
+import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 public class MainApplication implements CommandLineRunner {
-
-	private final String NAME = "Sergio Stives Barrios Buitrago";
-	private final Integer CHECK_POINT=  1;
-
-	private Integer INCREMENT = CHECK_POINT;
 
 	public static void main(String [] args) {
 		SpringApplication.run(MainApplication.class, args);
@@ -23,27 +20,23 @@ public class MainApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		Mono<Play> playMono = Mono.just(Play.builder().name(NAME).checkPoint(INCREMENT).build());
-
-		PlayCaretaker caretaker = new PlayCaretaker();
-		PlayOriginator originator = new PlayOriginator();
-
-		increment(playMono, originator);
-		increment(playMono, originator);
-
-		caretaker.addMemento(originator.save().block());
-
-		increment(playMono, originator);
-		originator.restore(caretaker.getMemento(0).block());
-
-		playMono = Mono.just(originator.getStatu());
-		System.out.println(playMono.block());
-
+		Mono.just(new Subject())
+				.flatMap(subject -> {
+					new ObserverMX(subject);
+					new ObserverCO(subject);
+					new ObserverDollar(subject);
+					return Mono.just(subject);})
+				.doOnNext(subject -> execute(10, subject))
+				.doOnNext(subject -> execute(100, subject))
+				.doOnNext(subject -> execute(200, subject))
+				.subscribe();
 	}
 
-	public void increment(Mono<Play> playMono, PlayOriginator originator){
-		INCREMENT++;
-		playMono = Mono.just(Play.builder().name(NAME).checkPoint(INCREMENT).build());
-		originator.setStatu(playMono.block());
+	private void execute(Integer value, Subject subject){
+		System.out.println("\n=======================================================");
+		System.out.println(String.format("If you want to change %s dollars you will get", value));
+		System.out.println("-------------------------------------------------------");
+		subject.setStatus(value);
+		System.out.println("=======================================================");
 	}
 }
