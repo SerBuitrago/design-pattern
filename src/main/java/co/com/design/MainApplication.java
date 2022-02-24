@@ -1,11 +1,12 @@
 package co.com.design;
 
-import co.com.pattern.Context;
-import co.com.pattern.service.AdvancedAntivirus;
-import co.com.pattern.service.SimpleAntivirus;
+
+import co.com.pattern.dao.PersonDao;
+import co.com.pattern.dao.impl.PersonDaoImpl;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 public class MainApplication implements CommandLineRunner {
@@ -16,13 +17,12 @@ public class MainApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("========================================");
-		Context context = new Context(new SimpleAntivirus());
-		context.execute();
-		System.out.println("========================================");
-		System.out.println("\n\n========================================");
-		context = new Context(new AdvancedAntivirus());
-		context.execute();
-		System.out.println("========================================");
+		PersonDao dao = new PersonDaoImpl();
+		dao.findAll().doOnNext(System.out::println).subscribe();
+
+		dao.findById(12).doOnNext(System.out::println).onErrorResume(error -> {
+			System.out.println(error.getMessage());
+			return Mono.empty();
+		}).subscribe();
 	}
 }
