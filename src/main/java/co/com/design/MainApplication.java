@@ -1,16 +1,21 @@
 package co.com.design;
 
-import co.com.pattern.Invoker;
-import co.com.pattern.model.Account;
-import co.com.pattern.operation.impl.OperationDeposit;
-import co.com.pattern.operation.impl.OperationWithdrawals;
+import co.com.pattern.PlayOriginator;
+import co.com.pattern.caretaker.PlayCaretaker;
+import co.com.pattern.model.Play;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import reactor.core.publisher.Mono;
 
 
 @SpringBootApplication
 public class MainApplication implements CommandLineRunner {
+
+	private final String NAME = "Sergio Stives Barrios Buitrago";
+	private final Integer CHECK_POINT=  1;
+
+	private Integer INCREMENT = CHECK_POINT;
 
 	public static void main(String [] args) {
 		SpringApplication.run(MainApplication.class, args);
@@ -18,16 +23,27 @@ public class MainApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		Account account = Account.builder().id(1).money(100.000D).build();
+		Mono<Play> playMono = Mono.just(Play.builder().name(NAME).checkPoint(INCREMENT).build());
 
-		OperationDeposit operationDeposit = new OperationDeposit(account, 200.000D);
-		OperationWithdrawals operationWithdrawals = new OperationWithdrawals(account, 100.000D);
+		PlayCaretaker caretaker = new PlayCaretaker();
+		PlayOriginator originator = new PlayOriginator();
 
-		Invoker invoker = new Invoker();
+		increment(playMono, originator);
+		increment(playMono, originator);
 
-		invoker.add(operationDeposit);
-		invoker.add(operationWithdrawals);
+		caretaker.addMemento(originator.save().block());
 
-		invoker.perform();
+		increment(playMono, originator);
+		originator.restore(caretaker.getMemento(0).block());
+
+		playMono = Mono.just(originator.getStatu());
+		System.out.println(playMono.block());
+
+	}
+
+	public void increment(Mono<Play> playMono, PlayOriginator originator){
+		INCREMENT++;
+		playMono = Mono.just(Play.builder().name(NAME).checkPoint(INCREMENT).build());
+		originator.setStatu(playMono.block());
 	}
 }
